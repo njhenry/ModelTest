@@ -1,21 +1,21 @@
 setwd("C:/Users/scro3122/Documents")
 library(dplyr)
 library(ggplot2)
-#inc <- read.csv("indi.data.for.treatmentseeking.final.csv")
+inc <- read.csv("indi.data.for.treatmentseeking.final.csv")
 
-years <- select(inc, year)[[1]]
+years <- dplyr::select(inc, year)[[1]]
 hist(years)
 print(table(years))
 
 inc2015 <- filter(inc, year == 2015)
-country2015 <- select(inc2015, Country)
+country2015 <- dplyr::select(inc2015, Country)
 print(table(country2015))
 
-print(sum(select(filter(inc2015, Country == "Nigeria"), rdt.result)[[1]]))
-print(sum(select(filter(inc2015, Country == "Mali"), rdt.result)[[1]]))
-print(sum(select(filter(inc2015, Country == "Rwanda"), rdt.result)[[1]]))
-print(sum(select(filter(inc2015, Country == "Kenya"), rdt.result)[[1]]))
-print(table(select(filter(inc2015, Country == "Mali"), urb.rural)))
+print(sum(dplyr::select(filter(inc2015, Country == "Nigeria"), rdt.result)[[1]]))
+print(sum(dplyr::select(filter(inc2015, Country == "Mali"), rdt.result)[[1]]))
+print(sum(dplyr::select(filter(inc2015, Country == "Rwanda"), rdt.result)[[1]]))
+print(sum(dplyr::select(filter(inc2015, Country == "Kenya"), rdt.result)[[1]]))
+print(table(dplyr::select(filter(inc2015, Country == "Mali"), urb.rural)))
 
 
 ##do Mali in 2015
@@ -32,7 +32,7 @@ startpathsT <- list("Z:/mastergrids/MODIS_Global/MOD11A2_LST/LST_Day/1km/Monthly
 endpathsT <- list(".Mean.1km.Data.tif",
                  ".Data.1km.Data.tif")
 
-tempCovs <- getTempCovsMonth(locs[,2:1], year, mali15$month, startpathsT, endpathsT, list("LST", "TempSuit"))
+tempCovs <- getTempCovsMonth(locs[,2:1], mali15$year, mali15$month, startpathsT, endpathsT, list("LST", "TempSuit"))
 
 
 #static covs
@@ -62,9 +62,13 @@ plot(r)
 sum(is.na(values(r)))
 
 library(FSIC)
-pr <- gpReg(c(locs, month), mali15$rdt.result)
-temp <- gpReg(c(locs, month) tempCovs$LST)
-ts <- gpReg(c(locs, month) tempCovs$TempSuit)
+pr <- gpReg(c(locs, mali15$month), mali15$rdt.result)
+temp <- gpReg(c(locs, mali15$month), tempCovs$LST)
+ts <- gpReg(c(locs, mali15$month), tempCovs$TempSuit)
 
 plot(temp, pr)
 plot(ts, pr)
+
+df <- data.frame(x=locs[,1], y=locs[,2], smoothtemp = temp + tempCovs$LST)
+p <- ggplot(df, aes(x=x,y=y, color=smoothtemp)) + geom_point()
+print(p)
