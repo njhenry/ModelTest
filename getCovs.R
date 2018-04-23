@@ -22,7 +22,8 @@ getStaticCovs <- function(locs, covpaths, covnames=NULL){
   return(outVals)
 }
 
-getTempCovsMonth <- function(locs, year, month, startpaths, endpaths, covnames=NULL){
+getTempCovsMonth <- function(locs, year, month, startpaths, endpaths, covnames=NULL,
+                             timelags=rep(0, length(startpaths))){
   outVals <- list()
   if(is.null(covnames)) namesSupplied <- FALSE else namesSupplied <- TRUE
   
@@ -57,7 +58,13 @@ getTempCovsMonth <- function(locs, year, month, startpaths, endpaths, covnames=N
       latmax <- ceiling(max(locsT[,1]))
       lonmin <- floor(min(locsT[,2]))
       lonmax <- ceiling(max(locsT[,2]))
-      unqTime <- unqTimes[j, ]
+      unqTime <- unqTimes[j, ] + c(0, timelags[i])
+
+      while(unqTime[2] > 12){
+        unqTime[2] <- unqTime[2] - 12
+        unqTime[1] <- unqTime[1] + 1
+      }
+
       if(as.numeric(unqTime[2]) < 10){
         covpath <- paste0(startpath, unqTime[1], ".0", as.numeric(unqTime[2]), endpath)
       }else{
