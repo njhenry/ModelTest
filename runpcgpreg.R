@@ -3,7 +3,7 @@ sourceCpp("C:/Users/scro3122/Documents/Mozambique/prewhitenfunctions.cpp")
 source("C:/Users/scro3122/Documents/Mozambique/pcalgparallelf.R")
 
 
-runpc <- function(obsDat, locs, times , alpha, G_0 = NULL, supprMessages = FALSE, nSample = length(obsDat[[1]]),
+runpc2 <- function(obsDat, locs, times , alpha, G_0 = NULL, supprMessages = FALSE, nSample = length(obsDat[[1]]),
                   plotgraph = TRUE, sampleList=NULL){
   if(!is.null(sampleList)){
     s <- sampleList
@@ -15,18 +15,11 @@ runpc <- function(obsDat, locs, times , alpha, G_0 = NULL, supprMessages = FALSE
   #print(times)
   obsDatpw <- list()
   for(i in 1:length(obsDat)){
-    obsDatpw[[i]] <- prewhiten(obsDat[[i]][s], locs[s, 1], locs[s, 2], times[s])
-  }
-  
-  ##normalise
-  obsDat.n <- list()
-  for(i in 1:length(obsDatpw)){
-    v <- obsDatpw[[i]]
-    obsDat.n[[i]] <- (v - mean(v, na.rm = T)) / sd(v, na.rm = T)
+    obsDatpw[[i]] <- gpReg(cbind(locs, times)[s], obsDat[[i]][s])
   }
   # print("o")
   # print(obsDatpw)
-  pc <- pcalg(obsDat.n, alpha, G_0 = G_0, supprMessages = supprMessages)
+  pc <- pcalg(obsDatpw, alpha, G_0 = G_0, supprMessages = supprMessages)
   if(plotgraph){
     library(graph)
     pcmat <- pc

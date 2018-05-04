@@ -77,6 +77,7 @@ getTempCovsDate2 <- function(locs, obsdates, folderpaths, endpaths, covnames=NUL
         #extract values
         cov.vals <- extract(cov, SpatialPoints(locs[nearIndex, 2:1, drop=FALSE]))
         outCovVals[nearIndex] <- cov.vals
+        rm(cov)
       }
     }
 
