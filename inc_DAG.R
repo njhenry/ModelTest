@@ -92,12 +92,82 @@ load("MaliCovs.RData")
 # print(p)
 
 obs <- c(staticCovs, tempCovs)
-obs$"pr" <- inc2015$rdt.result
-
+obs$"pr" <- mali15$rdt.result
+#save(list=c("obs", "mali15", "locs"), file = "MaliObs.RData")
 setwd("C:/Users/scro3122/Documents/ModelTest")
 source("runpc.R")
 setwd("C:/Users/scro3122/Documents/ModelTest")
 
-ptm <- proc.time()
-pc <- runpc(obs, locs, mali15$month, 1.00001, nSample=10)
-print(proc.time() - ptm)
+# 
+# ##set graph
+# nvar <- length(obs)
+# G_0 <- matrix(1, nrow=nvar, ncol=nvar) - diag(nvar)
+# G_0[length(obs), ] <- 0
+# 
+# ptm <- proc.time()
+# pc <- runpc(obs, locs, mali15$month, 0.1, nSample=600, G_0=G_0)
+# print(proc.time() - ptm)
+# 
+# plot.minimal(pc[[1]], targetIndex = length(obs), names(obs))
+
+# #######aggregate
+# lat.min <- min(locs[,1])
+# lat.max <- max(locs[,1])
+# lon.min <- min(locs[,2])
+# lon.max <- max(locs[,2])
+# 
+# N.blocks <- 25
+# obsAgg <- list()
+# point.block <- c()
+# 
+# #work out which points are in which block
+# for(i in 1:(dim(locs)[1])){
+#   loc <- locs[i, ]
+#   lat <- loc[1]
+#   lon <- loc[2]
+#   
+#   lat.n <- round(N.blocks * (lat - lat.min) / (lat.max - lat.min))
+#   lon.n <- round(N.blocks * (lon - lon.min) / (lon.max - lon.min))
+#   point.block[i] <- lat.n * N.blocks + lon.n + 1
+# }
+# 
+# centres <- c()
+# blocks <- unique(point.block)
+# #agregate for each block for each variable
+# for(i in 1:length(obs)){
+#   var.agg <- c()
+#   for(j in 1:length(blocks)){
+#     block <- blocks[j]
+#     var.agg <- c(var.agg, mean(obs[[i]][which(point.block==block)]))
+#   }
+#   obsAgg[[i]] <- var.agg
+# }
+# 
+# for(j in 1:length(blocks)){
+#   block <- blocks[j]
+#   centres <- rbind(centres, colMeans(locs[which(point.block==block), ]))
+# }
+# 
+# names(obsAgg) <- names(obs)
+# 
+# ptm <- proc.time()
+# pc <- runpc(obsAgg, locs, mali15$month, 0.2)
+# print(proc.time() - ptm)
+
+
+
+
+
+
+
+
+##########ICP
+source("C:/Users/scro3122/Documents/ModelTest/ICP.R")
+obs$'cluster' <- mali15$cluster.x
+
+
+icp.test <- icp(obs, locs, mali15$month, 0.5, 13, 14, nSample=600)
+
+#(obs, locs, times , alpha, target.index, environ.index, nSample = length(obsDat[[1]]))
+print(names(obs)[unique(unlist(icp.test[[3]]))])
+  
