@@ -99,16 +99,18 @@ source("runpc.R")
 setwd("C:/Users/scro3122/Documents/ModelTest")
 
 # 
-# ##set graph
-# nvar <- length(obs)
-# G_0 <- matrix(1, nrow=nvar, ncol=nvar) - diag(nvar)
-# G_0[length(obs), ] <- 0
-# 
-# ptm <- proc.time()
-# pc <- runpc(obs, locs, mali15$month, 0.1, nSample=600, G_0=G_0)
-# print(proc.time() - ptm)
-# 
-# plot.minimal(pc[[1]], targetIndex = length(obs), names(obs))
+##set graph
+nvar <- length(obs)
+G_0 <- matrix(1, nrow=nvar, ncol=nvar) - diag(nvar)
+G_0[length(obs), ] <- 0
+
+
+
+ptm <- proc.time()
+pc <- runpc(obs, locs, mali15$month, 0.1, nSample=100, G_0=G_0)
+print(proc.time() - ptm)
+
+plot.minimal(pc[[1]], targetIndex = length(obs), names(obs))
 
 # #######aggregate
 # lat.min <- min(locs[,1])
@@ -165,9 +167,9 @@ setwd("C:/Users/scro3122/Documents/ModelTest")
 source("C:/Users/scro3122/Documents/ModelTest/ICP.R")
 obs$'cluster' <- mali15$cluster.x
 
-
-icp.test <- icp(obs, locs, mali15$month, 0.5, 13, 14, nSample=600)
-
-#(obs, locs, times , alpha, target.index, environ.index, nSample = length(obsDat[[1]]))
-print(names(obs)[unique(unlist(icp.test[[3]]))])
+# 
+# icp.test <- icp(obs, locs, mali15$month, 0.5, 13, 14, nSample=600)
+# 
+# #(obs, locs, times , alpha, target.index, environ.index, nSample = length(obsDat[[1]]))
+# print(names(obs)[unique(unlist(icp.test[[3]]))])
   
