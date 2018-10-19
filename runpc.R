@@ -15,7 +15,7 @@ runpc <- function(obsDat, locs, times , alpha, G_0 = NULL, supprMessages = FALSE
   #print(times)
   obsDatpw <- list()
   for(i in 1:length(obsDat)){
-    obsDatpw[[i]] <- prewhiten(obsDat[[i]][s], locs[s, 1], locs[s, 2], times[s])
+    obsDatpw[[i]] <- prewhiten(obsDat[[i]][s], locs[s, 1], locs[s, 2], times[s], alpha=0.9)
   }
   
   ##normalise
@@ -46,8 +46,8 @@ runpc <- function(obsDat, locs, times , alpha, G_0 = NULL, supprMessages = FALSE
                                  edge = list(arrowsize=0.5)), main = "Skeleton_parallel")
   }
   
-
-  return(pc)
+  names(obsDatpw) <- names(obsDat)
+  return(c(pc, list(obsDatpw)))
 }
 
 plot.minimal <- function(adjMat, targetIndex, obsNames=NULL){
@@ -89,5 +89,4 @@ plot.minimal <- function(adjMat, targetIndex, obsNames=NULL){
   plot(am.graph, attrs = list(node = list(fillcolor = "white"),
                               edge = list(arrowsize=0.5)), main = paste0("Minimal"))
   
-
 }

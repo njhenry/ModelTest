@@ -64,7 +64,7 @@ getTempCovsDate3 <- function(locs, obsdates, folderpaths, endpaths, covnames=NUL
     }
     print(obsdates.use)
     print(locs.use)
-    outCovVals <- rep(NA, length(obsdates.use))
+    outCovVals <- rep(0, length(obsdates.use))
     folderpath <- folderpaths[[i]]
     endpath <- endpaths[[i]]
     
@@ -85,7 +85,7 @@ getTempCovsDate3 <- function(locs, obsdates, folderpaths, endpaths, covnames=NUL
     
     
     
-    ##for each obsdate associate two files, before and after, and the weightings
+    ##for each obsdate associate two files, before and after, and the weighting of each
     nearestFile2 <- c()
     weights <- c()
     nonneg <- function(vec){
@@ -94,14 +94,24 @@ getTempCovsDate3 <- function(locs, obsdates, folderpaths, endpaths, covnames=NUL
     }
     
     for(k in 1:length(obsdates.use)){
+      obsdate <- obsdates.use[k]
       #file before date
-      nearestFile2[2*k-1] <- which.min(nonneg(obsdates.use[k] - file.dates)) 
+      nearestFile2[2*k-1] <- which.min(nonneg(obsdate - file.dates)) 
       before.date <- file.dates[nearestFile2[2*k-1]]
       #file after date
-      nearestFile2[2*k] <- which.min(nonneg(file.dates - obsdates.use[k]))
+      nearestFile2[2*k] <- which.min(nonneg(file.dates - obsdate))
       after.date <- file.dates[nearestFile2[2*k]]
+      
+      #weights
+      a <- as.numeric(after.date - obsdate) / as.numeric(after.date - before.date)
+      b <- as.numeric(obsdate - before.date) / as.numeric(after.date - before.date)
+      
+      weights <- rbind(weights, c(a, b))
     }
     
+    nearestIndex2 <- sapply(1:length(file.names), function(k) ceiling(which(nearestFile2 == k)/2))
+    nearestIndex2After <- sapply(1:length(file.names), function(k) which(nearestFile2==k) %% 2)
+    nearestIndex2BeforeAfter <- sapply(nearestIndex2After, function(k) if(length(k) > 0) rbind(k, !k))
     
     #for each obsdate find which of the files are the nearest
     nearestFile <- c()
@@ -113,25 +123,44 @@ getTempCovsDate3 <- function(locs, obsdates, folderpaths, endpaths, covnames=NUL
     #find number of files that need to be opened
     nonempty <- c()
     for(j in 1:length(nearestIndex)){
-      if(length(nearestIndex[[j]] > 0)) nonempty <- c(nonempty, j)
+      if(length(nearestIndex2[[j]] > 0)) nonempty <- c(nonempty, j)
     }
     #for each file that has a non-zero number of nearest obsdates, open that covariate and
     #extract data at locations
     for(l in 1:length(nonempty)){
       j <- nonempty[l]
       print(paste0(l, " of ", length(nonempty)))
-      nearIndex <- nearestIndex[[j]]
+      nearIndex <- nearestIndex2[[j]]
       if(length(nearIndex) > 0){
         covpath <- paste0(folderpath, file.names[j])
         # print(covpath)
         cov <- raster(covpath)
         #extract values
         cov.vals <- extract(cov, SpatialPoints(locs.use[nearIndex, 2:1, drop=FALSE]))
-        outCovVals[nearIndex] <- cov.vals
+        outCovVals[nearIndex] <- outCovVals[nearIndex] + 
+          rowSums(t(nearestIndex2BeforeAfter[[j]]) * weights[nearIndex, ]) * cov.vals
         rm(cov)
       }
     }
+    print(outCovVals)
     
+    # outCovVals2 <- rep(NA, length(obsdates.use))
+    # ##check old code
+    # for(l in 1:length(nonempty)){
+    #   j <- nonempty[l]
+    #   print(paste0(l, " of ", length(nonempty)))
+    #   nearIndex <- nearestIndex[[j]]
+    #   if(length(nearIndex) > 0){
+    #     covpath <- paste0(folderpath, file.names[j])
+    #     # print(covpath)
+    #     cov <- raster(covpath)
+    #     #extract values
+    #     cov.vals <- extract(cov, SpatialPoints(locs.use[nearIndex, 2:1, drop=FALSE]))
+    #     outCovVals2[nearIndex] <- cov.vals
+    #   }
+    # }
+    # print(outCovVals2)
+    # 
     if(!is.null(timelags[[i]])){
       print(outCovVals)
       ##separate out timelags

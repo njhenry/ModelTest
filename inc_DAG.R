@@ -92,7 +92,10 @@ load("MaliCovs.RData")
 # print(p)
 
 obs <- c(staticCovs, tempCovs)
+obs$"net" <- mali15$net
+obs$"net"[is.na(obs$"net")] <- 0
 obs$"pr" <- mali15$rdt.result
+
 #save(list=c("obs", "mali15", "locs"), file = "MaliObs.RData")
 setwd("C:/Users/scro3122/Documents/ModelTest")
 source("runpc.R")
@@ -107,7 +110,7 @@ G_0[length(obs), ] <- 0
 
 
 ptm <- proc.time()
-pc <- runpc(obs, locs, mali15$month, 0.1, nSample=100, G_0=G_0)
+pc <- runpc(obs, locs, mali15$month, 0.1, nSample=500, G_0=G_0)
 print(proc.time() - ptm)
 
 plot.minimal(pc[[1]], targetIndex = length(obs), names(obs))
@@ -161,11 +164,11 @@ plot.minimal(pc[[1]], targetIndex = length(obs), names(obs))
 
 
 
-
-
-##########ICP
-source("C:/Users/scro3122/Documents/ModelTest/ICP.R")
-obs$'cluster' <- mali15$cluster.x
+# 
+# 
+# ##########ICP
+# source("C:/Users/scro3122/Documents/ModelTest/ICP.R")
+# obs$'cluster' <- mali15$cluster.x
 
 # 
 # icp.test <- icp(obs, locs, mali15$month, 0.5, 13, 14, nSample=600)
