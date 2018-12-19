@@ -5,14 +5,14 @@ library(Rcpp)
 library(TMB)  
 library(mvtnorm)
 
-# eco <- readOGR("Z:/Madagascar-NMCP/Madagascar Shapefiles/Madagascar_Admin_shapefiles/Ecozones8.shp")
-# 
-# md <- readOGR("Z:/Madagascar-NMCP/Madagascar Shapefiles/Madagascar_Admin_shapefiles/Malareo_District.shp")
-# 
-# 
-# W <- gTouches(md, byid = TRUE) * 1
-# 
-# W_eco <- gTouches(eco, byid = TRUE) * 1
+eco <- readOGR("Z:/Madagascar-NMCP/Madagascar Shapefiles/Madagascar_Admin_shapefiles/Ecozones8.shp")
+
+md <- readOGR("Z:/Madagascar-NMCP/Madagascar Shapefiles/Madagascar_Admin_shapefiles/Malareo_District.shp")
+
+
+W <- gTouches(md, byid = TRUE) * 1
+
+W_eco <- gTouches(eco, byid = TRUE) * 1
 
 setwd("C:/Users/scro3122/Documents/ModelTest/")
 compile("car.cpp")
