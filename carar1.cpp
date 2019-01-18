@@ -8,13 +8,11 @@ Type objective_function<Type>::operator() ()
 {
   using namespace density;
   DATA_SCALAR(sd_phi);
-  
   DATA_MATRIX(W);
   DATA_MATRIX(X);
   DATA_MATRIX(Y);    
   PARAMETER_VECTOR(beta);
   PARAMETER(sd);
-
   PARAMETER(inv_phi);
   //PARAMETER(sigma);
   
@@ -22,7 +20,7 @@ Type objective_function<Type>::operator() ()
   Type phi_mean = 0.0;
   Type phi = f_sc(inv_phi);
   
-
+  
   Type f=0;
   //f -= dnorm(phi, phi_mean, sd_pos, true);
   f -= dnorm(phi, phi_mean, sd_phi, true);

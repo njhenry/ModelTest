@@ -4,7 +4,19 @@ source("C:/Users/scro3122/Documents/Mozambique/pcalgparallelf.R")
 
 
 runpc <- function(obsDat, locs, times , alpha, G_0 = NULL, supprMessages = FALSE, nSample = length(obsDat[[1]]),
-                  plotgraph = TRUE, sampleList=NULL, pw=TRUE){
+                  plotgraph = TRUE, sampleList=NULL, pw=TRUE, returnSeed=FALSE, seed=NULL){
+  ptm <- proc.time()
+  #if seed supplied use it
+  if(!is.null(seed)){
+    set.seed(seed)
+  }else if(returnSeed){
+    seed <- runif(1)
+    set.seed(seed)
+  }
+  #if returnSeed, generate and save a seed and return it at the end
+
+
+  
   ##if pw (?prewhiten) is false we dont need to use locations and times at all
   ##or test them 
   
@@ -70,6 +82,8 @@ runpc <- function(obsDat, locs, times , alpha, G_0 = NULL, supprMessages = FALSE
   }
   
   names(obsDatpw) <- names(obsDat)
+  print(proc.time() - ptm)
+  if(returnSeed) return(c(pc, list(obsDatpw), seed))
   return(c(pc, list(obsDatpw)))
 }
 
